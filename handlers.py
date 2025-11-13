@@ -1,84 +1,155 @@
-import logging
-import ask_sdk_core.utils as ask_utils
-from ask_sdk_core.handler_input import HandlerInput
-from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
-from ask_sdk_model import Response
+# data_manager.py
 import unicodedata
 
+DOCTORES = {
+    "ramirez": {
+        "nombre": "Dra. Ramírez",
+        "especialidad": "Pediatría",
+        "dias": ["monday", "wednesday"],  # ISO weekday names for comparison
+        "inicio": 9,   # hora inicio (inclusive) -> 9 = 09:00
+        "fin": 13,     # hora fin (exclusive) -> 13 = hasta 13:00 (última franja 12:00-13:00)
+    },
+    "gomez": {
+        "nombre": "Dr. Gómez",
+        "especialidad": "Cardiología",
+        "dias": ["tuesday", "thursday"],
+        "inicio": 15,
+        "fin": 19,     # 15..18 -> franjas 15-16,16-17,17-18,18-19
+    },
+    "hernandez": {
+        "nombre": "Dr. Hernández",
+        "especialidad": "Dermatología",
+        "dias": ["friday"],
+        "inicio": 10,
+        "fin": 14,
+    },
+}
 
-from data_manager import get_doctor_info  # ✅ sin punto
+# Usuarios y citas en memoria
+# USUARIOS: key = user_key (nombre normalizado o telefono), value = {"nombre":..., "telefono":...}
+USUARIOS = {}
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+# CITAS: key = usuario_key, value = {"doctor": "ramirez", "fecha": "YYYY-MM-DD", "hora": "HH:MM"}
+CITAS = {}
 
-class LaunchRequestHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input: HandlerInput) -> bool:
-        return ask_utils.is_request_type("LaunchRequest")(handler_input)
+def _strip_accents(text: str) -> str:
+    if not text:
+        return text
+    text = unicodedata.normalize("NFKD", text)
+    text = "".join([c for c in text if not unicodedata.combining(c)])
+    return text
 
-    def handle(self, handler_input: HandlerInput) -> Response:
-        speak_output = (
-            "Bienvenido a la clínica. Soy su secretaria virtual. "
-            "¿Desea agendar una cita o consultar información?"
-        )
-        return (
-            handler_input.response_builder
-                .speak(speak_output)
-                .ask(speak_output)
-                .response
-        )
+def normalize_name(name: str) -> str:
+    if not name:
+        return None
+    n = _strip_accents(name).lower().strip()
+    # eliminar prefijos comunes
+    n = n.replace("dr ", "").replace("dra ", "").replace("doctor ", "").replace("doctora ", "")
+    return n
 
-class AgendarCitaIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        return ask_utils.is_intent_name("AgendarCitaIntent")(handler_input)
+def register_user(nombre: str, telefono: str = None) -> str:
+    key = normalize_name(nombre) if nombre else None
+    if not key and telefono:
+        key = f"tel_{telefono}"
+    if not key:
+        return None
+    USUARIOS[key] = {"nombre": nombre, "telefono": telefono}
+    return key
 
-    def handle(self, handler_input):
-        intent = handler_input.request_envelope.request.intent
-        slots = intent.slots
+def find_user_by_name_or_phone(text: str) -> str:
+    """
+    Dado nombre o teléfono (texto), intenta encontrar la key del usuario.
+    """
+    if not text:
+        return None
+    # si parece número
+    clean = text.strip()
+    if clean.isdigit():
+        # buscar por telefono
+        for k, v in USUARIOS.items():
+            if v.get("telefono") and clean in v.get("telefono"):
+                return k
+        return None
+    # buscar por nombre normalizado
+    candidate = normalize_name(clean)
+    if candidate in USUARIOS:
+        return candidate
+    # buscar por coincidencia parcial
+    for k, v in USUARIOS.items():
+        if candidate in normalize_name(v.get("nombre", "")):
+            return k
+    return None
 
-        doctor = slots.get("doctor").value if slots.get("doctor") else None
-        fecha = slots.get("fecha").value if slots.get("fecha") else None
-        hora = slots.get("hora").value if slots.get("hora") else None
+def get_doctor_info(nombre_doctor: str):
+    if not nombre_doctor:
+        return None
+    key = normalize_name(nombre_doctor)
+    return DOCTORES.get(key)
 
-        # Validación de que los 3 slots existan
-        if not doctor or not fecha or not hora:
-            speak_output = (
-                "Para agendar, necesito el nombre del doctor, la fecha y la hora. "
-                "Por favor diga: agendar cita con el doctor, día y hora."
-            )
-            return handler_input.response_builder.speak(speak_output).ask(speak_output).response
+def _weekday_from_date(date_iso: str) -> str:
+    """
+    date_iso expected YYYY-MM-DD
+    returns lowercase english weekday like 'monday'
+    """
+    from datetime import datetime
+    try:
+        dt = datetime.fromisoformat(date_iso)
+        return dt.strftime("%A").lower()
+    except Exception:
+        return None
 
-        # Validación de doctor permitido
-        doctores_validos = ["ramirez", "gomez", "hernandez"]
-        doctor_normalizado = doctor.lower().replace("dr ", "").replace("doctor ", "")
+def get_available_slots(doctor_key: str, fecha_iso: str):
+    """
+    Devuelve lista de horas disponibles en formato "HH:MM" para el doctor en la fecha.
+    Genera intervalos de 1 hora según inicio/fin definidos y excluye horas ya ocupadas.
+    """
+    doctor = DOCTORES.get(doctor_key)
+    if not doctor:
+        return []
 
-        if doctor_normalizado not in doctores_validos:
-            speak_output = (
-                f"Lo siento, no tengo registrado al doctor {doctor}. "
-                "Los doctores disponibles son Ramírez, Gómez y Hernández."
-            )
-            return handler_input.response_builder.speak(speak_output).ask("¿Desea intentar con otro doctor?").response
+    weekday = _weekday_from_date(fecha_iso)
+    if weekday not in doctor["dias"]:
+        return []
 
-        # TODO — Aquí puedes agregar lógica para guardar la cita en tu base/agenda
-        
-        speak_output = (
-            f"Cita agendada con el doctor {doctor} el {fecha} a las {hora}. "
-            "¿Desea algo más?"
-        )
-        return handler_input.response_builder.speak(speak_output).ask("¿Necesita algo más?").response
+    inicio = doctor["inicio"]
+    fin = doctor["fin"]
+    slots = [f"{h:02d}:00" for h in range(inicio, fin)]
+    # quitar los slots ocupados
+    ocupados = []
+    for u, cita in CITAS.items():
+        if cita.get("doctor") == doctor_key and cita.get("fecha") == fecha_iso:
+            ocupados.append(cita.get("hora"))
+    disponibles = [s for s in slots if s not in ocupados]
+    return disponibles
 
+def user_has_appointment(user_key: str) -> bool:
+    return user_key in CITAS
 
-class SessionEndedRequestHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input: HandlerInput) -> bool:
-        return ask_utils.is_request_type("SessionEndedRequest")(handler_input)
+def save_appointment(user_key: str, doctor_key: str, fecha_iso: str, hora_str: str) -> bool:
+    # verifica disponibilidad
+    disponibles = get_available_slots(doctor_key, fecha_iso)
+    if hora_str not in disponibles:
+        return False
+    CITAS[user_key] = {"doctor": doctor_key, "fecha": fecha_iso, "hora": hora_str}
+    return True
 
-    def handle(self, handler_input: HandlerInput) -> Response:
-        return handler_input.response_builder.response
+def get_user_appointment(user_key: str):
+    return CITAS.get(user_key)
 
-class CatchAllExceptionHandler(AbstractExceptionHandler):
-    def can_handle(self, handler_input: HandlerInput, exception: Exception) -> bool:
+def cancel_appointment(user_key: str) -> bool:
+    if user_key in CITAS:
+        del CITAS[user_key]
         return True
+    return False
 
-    def handle(self, handler_input: HandlerInput, exception: Exception) -> Response:
-        logger.error(exception, exc_info=True)
-        speak_output = "Hubo un problema procesando su solicitud. Por favor intente de nuevo."
-        return handler_input.response_builder.speak(speak_output).ask(speak_output).response
+def move_appointment(user_key: str, nueva_fecha: str, nueva_hora: str) -> bool:
+    cita = CITAS.get(user_key)
+    if not cita:
+        return False
+    doctor = cita.get("doctor")
+    disponibles = get_available_slots(doctor, nueva_fecha)
+    if nueva_hora not in disponibles:
+        return False
+    # actualizar
+    CITAS[user_key] = {"doctor": doctor, "fecha": nueva_fecha, "hora": nueva_hora}
+    return True
