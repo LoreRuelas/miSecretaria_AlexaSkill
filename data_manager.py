@@ -1,15 +1,72 @@
+# data_manager.py
+
+from models import Doctor, Cita
+
+
+# === Diccionario principal ===
 DOCTORES = {
-    "ramirez": {
-        "especialidad": "pediatra", 
-        "horario_atencion": "Lunes y Miércoles de 9:00 a 13:00"
-    },
-    "gomez": {
-        "especialidad": "cardiologo", 
-        "horario_atencion": "Martes y Jueves de 15:00 a 19:00"
-    },
+    "ramirez": Doctor(
+        id="ramirez",
+        nombre="Dra. Ramírez",
+        especialidad="Pediatría",
+        citas=[
+            Cita("lunes", "1:00"),
+            Cita("lunes", "2:00", ocupada=True),
+            Cita("miércoles", "2:00"),
+        ],
+    ),
+
+    "gomez": Doctor(
+        id="gomez",
+        nombre="Dr. Gómez",
+        especialidad="Cardiología",
+        citas=[
+            Cita("lunes", "2:00"),
+            Cita("miércoles", "3:00", ocupada=True),
+        ],
+    ),
+
+    "hernandez": Doctor(
+        id="hernandez",
+        nombre="Dr. Hernández",
+        especialidad="Dermatología",
+        citas=[
+            Cita("lunes", "4:00"),
+            Cita("miércoles", "2:00", ocupada=True),
+        ],
+    ),
 }
 
+
+# === Aliases o sinónimos válidos ===
+ALIASES = {
+    "dra ramirez": "ramirez",
+    "dra. ramirez": "ramirez",
+    "dr ramirez": "ramirez",
+    "dr. ramirez": "ramirez",
+
+    "dr gomez": "gomez",
+    "dr. gomez": "gomez",
+
+    "dr hernandez": "hernandez",
+    "dr. hernandez": "hernandez",
+}
+
+
+# === Función principal ===
 def get_doctor_info(nombre_doctor):
-    if nombre_doctor:
-        return DOCTORES.get(nombre_doctor.lower(), None)
+    if not nombre_doctor:
+        return None
+
+    nombre_doctor = nombre_doctor.lower()
+
+    # 1) Buscar directo en el diccionario
+    if nombre_doctor in DOCTORES:
+        return DOCTORES[nombre_doctor]
+
+    # 2) Buscar por alias
+    if nombre_doctor in ALIASES:
+        original = ALIASES[nombre_doctor]
+        return DOCTORES.get(original)
+
     return None
