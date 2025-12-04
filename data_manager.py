@@ -11,7 +11,7 @@ DOCTORES = {
         especialidad="Pediatría",
         citas=[
             Cita("lunes", "1:00"),
-            Cita("lunes", "2:00", ocupada=True),
+            Cita("lunes", "2:00"),
             Cita("miércoles", "2:00"),
         ],
     ),
@@ -22,7 +22,7 @@ DOCTORES = {
         especialidad="Cardiología",
         citas=[
             Cita("lunes", "2:00"),
-            Cita("miércoles", "3:00", ocupada=True),
+            Cita("miércoles", "3:00"),
         ],
     ),
 
@@ -32,7 +32,7 @@ DOCTORES = {
         especialidad="Dermatología",
         citas=[
             Cita("lunes", "4:00"),
-            Cita("miércoles", "2:00", ocupada=True),
+            Cita("miércoles", "2:00"),
         ],
     ),
 }
@@ -53,7 +53,38 @@ ALIASES = {
 }
 
 
-# === Función principal ===
+def ocupar_cita(doctor_id, dia, hora):
+    doctor = DOCTORES.get(doctor_id)
+    if not doctor:
+        return False
+    
+    for cita in doctor.citas:
+        if cita.dia == dia and cita.hora == hora and not cita.ocupada:
+            cita.ocupada = True
+            return True
+
+    return False
+
+def get_citas_ocupadas(doctor_id):
+    doctor = DOCTORES.get(doctor_id)
+    if not doctor:
+        return []
+    return [c for c in doctor.citas if c.ocupada]
+
+
+def cancelar_cita(doctor_id, dia, hora):
+    doctor = DOCTORES.get(doctor_id)
+    if not doctor:
+        return False
+    
+    for cita in doctor.citas:
+        if cita.dia == dia and cita.hora == hora and cita.ocupada:
+            cita.ocupada = False
+            return True
+    
+    return False
+    
+    # === Función principal ===
 def get_doctor_info(nombre_doctor):
     if not nombre_doctor:
         return None
@@ -70,3 +101,16 @@ def get_doctor_info(nombre_doctor):
         return DOCTORES.get(original)
 
     return None
+    
+    
+    
+    
+    
+
+
+    
+    
+
+
+
+    
