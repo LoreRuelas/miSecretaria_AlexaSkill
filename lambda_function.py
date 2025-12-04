@@ -3,7 +3,10 @@ from ask_sdk_core.skill_builder import SkillBuilder
 
 from handlers import (
     LaunchRequestHandler, 
-    AgendarCitaIntentHandler, 
+    AgendarCitaIntentHandler,
+    ElegirCitaIntentHandler,
+    CancelarCitaIntentHandler,
+    ConfirmarCancelacionIntentHandler,
     SessionEndedRequestHandler,
     CatchAllExceptionHandler
 )
@@ -24,6 +27,9 @@ sb = SkillBuilder()  # ✅ así iniciamos sin errores
 # Handlers
 sb.add_request_handler(LaunchRequestHandler())
 sb.add_request_handler(AgendarCitaIntentHandler())
+sb.add_request_handler(ElegirCitaIntentHandler())
+sb.add_request_handler(CancelarCitaIntentHandler())
+sb.add_request_handler(ConfirmarCancelacionIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
 sb.add_exception_handler(CatchAllExceptionHandler())
 
