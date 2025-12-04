@@ -3,7 +3,7 @@ PROJECT GENERAL DATA
 
 Estrcutura del código
 -
-<img width="278" height="242" alt="image" src="https://github.com/user-attachments/assets/bc825d69-c94a-411f-8f8c-6766087b478b" />
+<img width="225" height="207" alt="image" src="https://github.com/user-attachments/assets/0539a8f2-0492-4a59-b3c3-f5237bc196f7" />
 
 Invocation name
 -
