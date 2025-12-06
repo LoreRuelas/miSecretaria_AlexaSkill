@@ -1,0 +1,255 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "slots": [],
+          "name": "HelloWorldIntent",
+          "samples": [
+            "hola",
+            "como estás",
+            "di hola mundo",
+            "di hola",
+            "hola mundo"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "slots": [
+            {
+              "name": "doctor",
+              "type": "DOCTOR_TYPE"
+            }
+          ],
+          "name": "AgendarCitaIntent",
+          "samples": [
+            "reservar cita con {doctor}",
+            "programar cita",
+            "quiero una cita con {doctor}",
+            "agendar cita",
+            "deseo agendar una cita",
+            "quiero agendar una cita",
+            "agendar cita con {doctor}"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "opcion",
+              "type": "OPCION_CITA"
+            }
+          ],
+          "name": "ElegirCitaIntent",
+          "samples": [
+            "quiero la opcion {opcion}",
+            "quiero la {opcion}",
+            "será la {opcion}",
+            "elijo {opcion}",
+            "quiero la opción {opcion}",
+            "escojo {opcion}",
+            "la {opcion}",
+            "opción {opcion}"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "doctor",
+              "type": "DOCTOR_TYPE"
+            }
+          ],
+          "name": "ConsultarInfoIntent",
+          "samples": [
+            "información del doctor {doctor}",
+            "info del doctor {doctor}",
+            "cuéntame sobre {doctor}",
+            "quiero información de {doctor}",
+            "consultar información del doctor {doctor}",
+            "dime sobre el doctor {doctor}"
+          ]
+        },
+        {
+          "slots": [],
+          "name": "ListarDoctoresIntent",
+          "samples": [
+            "qué doctores hay",
+            "lista de doctores",
+            "cuáles son los doctores",
+            "quiénes son los doctores",
+            "dime los doctores disponibles",
+            "mostrar doctores",
+            "ver doctores"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "doctor",
+              "type": "DOCTOR_TYPE"
+            }
+          ],
+          "name": "CancelarCitaIntent",
+          "samples": [
+            "cancela mi cita con {doctor}",
+            "cancelar cita con {doctor} ",
+            "quiero cancelar cita",
+            "cancelar cita"
+          ]
+        },
+        {
+          "slots": [],
+          "name": "ConfirmarCancelacionIntent",
+          "samples": [
+            "sí quiero cancelar mi cita",
+            "si quiero cancelar",
+            "confirmo la cancelación",
+            "sí cancela",
+            "confirmar",
+            "sí"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "synonyms": [
+                  "Hernandez",
+                  "Doctor Hernández",
+                  "Dr Hernández"
+                ],
+                "value": "Hernández"
+              },
+              "id": "hernandez"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "Doctora Ramírez",
+                  "Dra Ramírez",
+                  "Dr. Ramirez",
+                  "Ramirez"
+                ],
+                "value": "ramirez"
+              },
+              "id": "ramirez"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "Doctor Gómez",
+                  "Dr Gómez",
+                  "Dr. Gomez",
+                  "Gomez"
+                ],
+                "value": "gomez"
+              },
+              "id": "gomez"
+            }
+          ],
+          "name": "DOCTOR_TYPE"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "synonyms": [
+                  "la a",
+                  "a",
+                  "la A",
+                  "opción A",
+                  "A"
+                ],
+                "value": "a"
+              },
+              "id": "a"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "E",
+                  "la e",
+                  "opción E",
+                  "la E",
+                  "e"
+                ],
+                "value": "e"
+              },
+              "id": "e"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "D",
+                  "la d",
+                  "opción D",
+                  "la D",
+                  "d"
+                ],
+                "value": "d"
+              },
+              "id": "d"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "C",
+                  "la c",
+                  "opción C",
+                  "la C",
+                  "c"
+                ],
+                "value": "c"
+              },
+              "id": "c"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "B",
+                  "la b",
+                  "opción B",
+                  "la B",
+                  "b"
+                ],
+                "value": "b"
+              },
+              "id": "b"
+            },
+            {
+              "name": {
+                "synonyms": [
+                  "F",
+                  "la f",
+                  "opción F",
+                  "la F",
+                  "f"
+                ],
+                "value": "f"
+              },
+              "id": "f"
+            }
+          ],
+          "name": "OPCION_CITA"
+        }
+      ],
+      "invocationName": "mi secretaria"
+    }
+  }
+}
