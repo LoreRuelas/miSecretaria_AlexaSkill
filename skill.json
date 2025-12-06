@@ -1,0 +1,41 @@
+{
+  "manifest": {
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:032182186954:function:18ea20ae-c601-46ce-845c-ccc53d3271da:Release_0"
+        },
+        "interfaces": [],
+        "locales": {},
+        "regions": {
+          "NA": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-east-1:032182186954:function:18ea20ae-c601-46ce-845c-ccc53d3271da:Release_0"
+            }
+          },
+          "EU": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:eu-west-1:032182186954:function:18ea20ae-c601-46ce-845c-ccc53d3271da:Release_0"
+            }
+          },
+          "FE": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-west-2:032182186954:function:18ea20ae-c601-46ce-845c-ccc53d3271da:Release_0"
+            }
+          }
+        }
+      }
+    },
+    "manifestVersion": "1.0",
+    "publishingInformation": {
+      "distributionCountries": [],
+      "isAvailableWorldwide": true,
+      "locales": {
+        "es-MX": {
+          "name": "proyecto"
+        }
+      },
+      "testingInstructions": "Sample Testing Instructions."
+    }
+  }
+}
